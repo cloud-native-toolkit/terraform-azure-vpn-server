@@ -1,0 +1,9 @@
+name: azure-vpn-server
+type: terraform
+description: Module to provision vpn-server on azure
+tags:
+  - tools
+  - devops
+versions: []
+cloudProvider: azure
+id: github.com/cloud-native-toolkit/terraform-azure-vpn-server
