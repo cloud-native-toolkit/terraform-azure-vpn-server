@@ -2,10 +2,49 @@ name: azure-vpn-server
 type: terraform
 description: Module to provision vpn-server on azure
 tags:
-  - tools
-  - devops
+  - azure
+  - azure-vm
+  - virtual-machine
+  - azure-vpn-server
 versions:
   - platforms: []
-    dependencies: []
-    variables: []
+    providers:
+      - name: azurerm
+        source: "hashicorp/azurerm"
+    dependencies:
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-resource-group
+            version: ">= 1.0.0"
+      - id: vnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-vnet
+            version: ">= 1.0.2"
+      - id: subnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-subnets
+            version: ">= 1.2.2"
+      - id: ssh_key
+        optional: true
+        refs:
+          - source: github.com/cloud-native-toolkit/teraform-azure-ssh-key
+            version: ">= 1.0.2"
+    variables:
+      - name: resource_group_name
+        moduleRef:
+          id: resource_group
+          output: name
+      - name: virtual_network_name
+        moduleRef:
+          id: vnet
+          output: name
+      - name: subnet_id
+        moduleRef:
+          id: subnet
+          output: id
+      - name: pub_ssh_key
+        optional: true
+        moduleRef: 
+          id: ssh_key
+          output: pub_key
 cloudProvider: azure
