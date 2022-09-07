@@ -67,6 +67,19 @@ variable "storage_type" {
   default     = "StandardSSD_LRS"
 }
 
+variable "vm_public_ip_sku" {
+  type        = string
+  description = "Public IP SKU Size (default = \"Standard\")"
+  default     = "Standard"
+}
+
+variable "vm_public_ip_allocation_method" {
+  type        = string
+  description = "The Azure subnet Public ip address alocation type - Dynamic or Static (default = \"Dynamic\")"
+  default     = "Static"
+}
+
+
 // Open VPN OS image properties
 variable "openvpn_image_publisher" {
   type        = string
