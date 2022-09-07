@@ -112,7 +112,7 @@ resource "azurerm_network_interface" "public" {
   name                          = "${local.net_if_name}-public"
   location                      = data.azurerm_resource_group.resource_group.location
   resource_group_name           = data.azurerm_resource_group.resource_group.name
-  enable_accelerated_networking = true
+  enable_accelerated_networking = var.azurerm_network_interface_accelerated_networking
 
   ip_configuration {
     name                          = local.ip_config_name

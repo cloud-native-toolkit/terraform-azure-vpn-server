@@ -8,6 +8,12 @@ variable "subnet_id" {
   description = "The Azure subnet id to which to attach the virtual machine private NIC"
 }
 
+variable "azurerm_network_interface_accelerated_networking" {
+  type        = bool
+  description = "Use SSH key for access to Linux VM (default = \"true\")"
+  default     = true
+}
+
 variable "name_prefix" {
   type        = string
   description = "Name to prefix resources created"
@@ -80,7 +86,6 @@ variable "vm_public_ip_allocation_method" {
 }
 
 
-// Open VPN OS image properties
 variable "openvpn_image_publisher" {
   type        = string
   description = "Open VPN OS image publisher name (default = \"openvpn\")"
@@ -104,3 +109,5 @@ variable "openvpn_image_version" {
   description = "Linux OS image version (default = \"latest\")"
   default     = "latest"
 }
+
+
