@@ -4,6 +4,11 @@ variable "resource_group_name" {
   description = "The name of the Azure resource group where the VM is to be provisioned. The VM will be provisioned in the same location as the resource group."
 }
 
+variable "virtual_network_name" {
+  type        = string
+  description = "The name of the Azure VNet."
+}
+
 variable "subnet_id" {
   type        = string
   description = "The Azure subnet id to which to attach the virtual machine private NIC"
