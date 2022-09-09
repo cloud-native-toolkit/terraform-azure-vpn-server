@@ -56,44 +56,9 @@ resource "azurerm_linux_virtual_machine" "vm-openvpn" {
 
 data "azurerm_virtual_machine" "vm" {
   #   name                = var.machine_type == "Linux" ? var.use_ssh ? azurerm_linux_virtual_machine.vm-openvpn[0].name : azurerm_linux_virtual_machine.vm-pwd[0].name : azurerm_windows_virtual_machine.vm[0].name
-  name                = azurerm_linux_virtual_machine.vm-openvpn.name
+  name                = var.machine_type
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }
-
-
-// Create ssh key for Open VPN Server if not provided
-resource "tls_private_key" "key" {
-  # count = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
-  count     = 1
-  algorithm = "RSA"
-  rsa_bits  = "4096"
-}
-
-resource "local_file" "private_key" {
-  # count = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
-  count           = 1
-  content         = tls_private_key.key[0].private_key_pem
-  filename        = "${path.cwd}/${local.key_name}"
-  file_permission = "0600"
-}
-
-resource "local_file" "public_key" {
-  # count = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
-  count           = 1
-  content         = tls_private_key.key[0].public_key_openssh
-  filename        = "${path.cwd}/${local.key_name}.pub"
-  file_permission = "0644"
-}
-
-data "local_file" "pub_key" {
-  # count = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
-  count = 1
-  depends_on = [
-    local_file.public_key
-  ]
-  filename = "${path.cwd}/${local.key_name}.pub"
-}
-
 
 // Create public IP and public NIC if required
 resource "azurerm_public_ip" "vm_public_ip" {
@@ -126,4 +91,40 @@ resource "azurerm_network_interface" "public" {
 data "azurerm_network_interface" "vm_nic" {
   name                = azurerm_network_interface.public.name
   resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
+
+// Create ssh key for Open VPN Server if not provided
+
+resource "tls_private_key" "key" {
+  count = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
+
+  algorithm = "RSA"
+  rsa_bits  = "4096"
+}
+
+resource "local_file" "private_key" {
+  count = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
+
+  content         = tls_private_key.key[0].private_key_pem
+  filename        = "${path.cwd}/${local.key_name}"
+  file_permission = "0600"
+}
+
+resource "local_file" "public_key" {
+  count = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
+
+  content         = tls_private_key.key[0].public_key_openssh
+  filename        = "${path.cwd}/${local.key_name}.pub"
+  file_permission = "0644"
+}
+
+data "local_file" "pub_key" {
+  count = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
+
+  depends_on = [
+    local_file.public_key
+  ]
+
+  filename = "${path.cwd}/${local.key_name}.pub"
 }

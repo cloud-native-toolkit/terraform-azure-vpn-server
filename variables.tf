@@ -1,3 +1,4 @@
+
 variable "resource_group_name" {
   type        = string
   description = "The name of the Azure resource group where the VM is to be provisioned. The VM will be provisioned in the same location as the resource group."
@@ -35,6 +36,12 @@ variable "pub_ssh_key" {
   type        = string
   description = "Public SSH key for VM access. Provide an empty variable for windows VMs as it is not used."
   default     = ""
+}
+
+variable "create_ssh" {
+  type        = bool
+  description = "Flag to determine whether to create an SSH key pair (default = \"true\")"
+  default     = true
 }
 
 variable "public" {
