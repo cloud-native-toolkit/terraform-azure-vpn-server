@@ -17,8 +17,7 @@ data "azurerm_resource_group" "resource_group" {
 // OpenVPN VM Configurations
 
 resource "azurerm_linux_virtual_machine" "vm-openvpn" {
-  # count = var.machine_type == "Linux" && var.use_ssh ? 1 : 0
-
+ 
   name                = local.vm_name
   computer_name       = local.vm_name
   resource_group_name = data.azurerm_resource_group.resource_group.name
@@ -54,16 +53,14 @@ resource "azurerm_linux_virtual_machine" "vm-openvpn" {
   }
 }
 
-data "azurerm_virtual_machine" "vm" {
-  #   name                = var.machine_type == "Linux" ? var.use_ssh ? azurerm_linux_virtual_machine.vm-openvpn[0].name : azurerm_linux_virtual_machine.vm-pwd[0].name : azurerm_windows_virtual_machine.vm[0].name
-  name                = var.machine_type
-  resource_group_name = data.azurerm_resource_group.resource_group.name
-}
+# data "azurerm_linux_virtual_machine" "vm" {
+#   name                = var.machine_type
+#   resource_group_name = data.azurerm_resource_group.resource_group.name
+# }
 
 // Create public IP and public NIC if required
 resource "azurerm_public_ip" "vm_public_ip" {
-  # count = var.public ? 1 : 0
-
+ 
   name                = local.public_ip_name
   resource_group_name = data.azurerm_resource_group.resource_group.name
   location            = data.azurerm_resource_group.resource_group.location
@@ -72,8 +69,7 @@ resource "azurerm_public_ip" "vm_public_ip" {
 }
 
 resource "azurerm_network_interface" "public" {
-  # count = var.public ? 1 : 0
-
+  
   name                          = "${local.net_if_name}-public"
   location                      = data.azurerm_resource_group.resource_group.location
   resource_group_name           = data.azurerm_resource_group.resource_group.name
