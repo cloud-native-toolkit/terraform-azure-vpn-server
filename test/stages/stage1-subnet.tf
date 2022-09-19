@@ -17,53 +17,53 @@ module "subnets" {
     destination = "*"
     tcp = {
       destination_port_range = "22"
-      source_port_range = "*"
+      source_port_range      = "*"
     }
-    }, 
+    },
     {
-    name        = "vpn-inbound"
-    action      = "Allow"
-    direction   = "Inbound"
-    source      = "*"
-    destination = "*"
-    udp = {
-      destination_port_range = "1194"
-      source_port_range = "*"
+      name        = "vpn-inbound"
+      action      = "Allow"
+      direction   = "Inbound"
+      source      = "*"
+      destination = "*"
+      udp = {
+        destination_port_range = "1194"
+        source_port_range      = "*"
+      }
+    },
+    {
+      name        = "cluster_port"
+      action      = "Allow"
+      direction   = "Inbound"
+      source      = "*"
+      destination = "*"
+      tcp = {
+        destination_port_range = "945"
+        source_port_range      = "*"
+      }
+    },
+    {
+      name        = "tcp_connection"
+      action      = "Allow"
+      direction   = "Inbound"
+      source      = "*"
+      destination = "*"
+      tcp = {
+        destination_port_range = "443"
+        source_port_range      = "*"
+      }
+    },
+    {
+      name        = "admin_tcp"
+      action      = "Allow"
+      direction   = "Inbound"
+      source      = "*"
+      destination = "*"
+      tcp = {
+        destination_port_range = "943"
+        source_port_range      = "*"
+      }
     }
-  },
-  {
-    name        = "cluster_port"
-    action      = "Allow"
-    direction   = "Inbound"
-    source      = "*"
-    destination = "*"
-    tcp = {
-      destination_port_range = "945"
-      source_port_range = "*"
-    }
-  },
-  {
-    name        = "tcp_connection"
-    action      = "Allow"
-    direction   = "Inbound"
-    source      = "*"
-    destination = "*"
-    tcp = {
-      destination_port_range = "443"
-      source_port_range = "*"
-    }
-  },
-  {
-    name        = "admin_tcp"
-    action      = "Allow"
-    direction   = "Inbound"
-    source      = "*"
-    destination = "*"
-    tcp = {
-      destination_port_range = "943"
-      source_port_range = "*"
-    }
-  }
   ]
 
 

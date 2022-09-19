@@ -1,18 +1,18 @@
 output "id" {
-  value = azurerm_linux_virtual_machine.vm-openvpn.id
+  value = module.openvpn-server.id
 }
 
 output "vm_public_ip" {
-  value = azurerm_public_ip.vm_public_ip.ip_address
+  value = module.openvpn-server.vm_public_ip
 }
 
 output "vm_public_fqdn" {
-  value = azurerm_public_ip.vm_public_ip.fqdn
+  value = module.openvpn-server.vm_public_fqdn
 }
 
 output "admin_username" {
   depends_on = [
-    azurerm_linux_virtual_machine.vm-openvpn
+    module.openvpn-server
   ]
   value = var.admin_username
 }

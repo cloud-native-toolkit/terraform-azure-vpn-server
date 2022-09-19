@@ -16,9 +16,9 @@ variable "name_prefix" {
 }
 
 variable "vnet_cidr" {
-  type = string
+  type        = string
   description = "CIDR for VNet"
-  default = "10.0.0.0/18"
+  default     = "10.0.0.0/18"
 }
 
 variable "enabled" {}

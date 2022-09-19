@@ -14,15 +14,16 @@ variable "subnet_id" {
   description = "The Azure subnet id to which to attach the virtual machine private NIC"
 }
 
-variable "azurerm_network_interface_accelerated_networking" {
-  type        = bool
-  description = "Use SSH key for access to Linux VM (default = \"true\")"
-  default     = true
-}
+# variable "azurerm_network_interface_accelerated_networking" {
+#   type        = bool
+#   description = "Use SSH key for access to Linux VM (default = \"true\")"
+#   default     = true
+# }
 
 variable "name_prefix" {
   type        = string
   description = "Name to prefix resources created"
+  default     = "opn-vpn"
 }
 
 variable "machine_type" {
@@ -98,28 +99,28 @@ variable "vm_public_ip_allocation_method" {
 }
 
 
-variable "openvpn_image_publisher" {
-  type        = string
-  description = "Open VPN OS image publisher name (default = \"openvpn\")"
-  default     = "openvpn"
-}
+# variable "openvpn_image_publisher" {
+#   type        = string
+#   description = "Open VPN OS image publisher name (default = \"openvpn\")"
+#   default     = "openvpn"
+# }
 
-variable "openvpn_image_offer" {
-  type        = string
-  description = "Open VPN OS image source offer (default = \"openvpnas\")"
-  default     = "openvpnas"
-}
+# variable "openvpn_image_offer" {
+#   type        = string
+#   description = "Open VPN OS image source offer (default = \"openvpnas\")"
+#   default     = "openvpnas"
+# }
 
-variable "openvpn_image_sku" {
-  type        = string
-  description = "Open VPN OS image SKU (defualt = \"access_server_byol\")"
-  default     = "access_server_byol"
-}
+# variable "openvpn_image_sku" {
+#   type        = string
+#   description = "Open VPN OS image SKU (defualt = \"access_server_byol\")"
+#   default     = "access_server_byol"
+# }
 
-variable "openvpn_image_version" {
-  type        = string
-  description = "Linux OS image version (default = \"latest\")"
-  default     = "latest"
-}
+# variable "openvpn_image_version" {
+#   type        = string
+#   description = "Linux OS image version (default = \"latest\")"
+#   default     = "latest"
+# }
 
 

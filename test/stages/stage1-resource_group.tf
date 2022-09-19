@@ -1,7 +1,7 @@
 resource "random_string" "cluster_id" {
-    length = 5
-    special = false
-    upper = false
+  length  = 5
+  special = false
+  upper   = false
 }
 
 locals {
