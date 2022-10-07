@@ -29,7 +29,7 @@ module "openvpn-server" {
   vm_size          = var.vm_size
   storage_type     = var.storage_type
   admin_username   = var.admin_username
-  bootstrap_script = var.bootstrap_script
+  bootstrap_script = locals.bootstrap_script
 
 }
 
