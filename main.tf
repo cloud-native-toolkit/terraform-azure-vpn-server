@@ -1,24 +1,14 @@
 locals {
-  net_if_name    = "${var.name_prefix}-nic"
-  ip_config_name = "${var.name_prefix}-ip-config"
-  vm_name        = "${var.name_prefix}-opnvm"
-  os_disk_name   = "${var.name_prefix}-osdisk"
-  public_ip_name = "${var.name_prefix}-pip"
-  key_name       = "${var.name_prefix}-key"
-
-  bootstrap_script = var.bootstrap_script == "" ? "${path.module}/templates/linux_user-data.sh" : var.bootstrap_script
+   bootstrap_script = var.bootstrap_script == "" ? "${path.module}/templates/vm_user-data.sh" : var.bootstrap_script
+   openvpn-test-script = "${path.module}/scripts/openvpn-test.sh"
+   private-key-file = "${var.name_prefix}-key"
 }
 
-// Get resource group details
-data "azurerm_resource_group" "resource_group" {
-  name = var.resource_group_name
-}
-
-// OpenVPN VM Configurations
+// Open-VPN VM Configurations
 module "openvpn-server" {
 
   source                             = "github.com/cloud-native-toolkit/terraform-azure-vm?ref=v2.0.2"
-  name_prefix                        = local.vm_name
+  name_prefix                        = var.name_prefix
   resource_group_name                = var.resource_group_name
   subnet_id                          = var.subnet_id
   create_ssh                         = var.create_ssh
@@ -30,12 +20,17 @@ module "openvpn-server" {
   storage_type     = var.storage_type
   admin_username   = var.admin_username
   bootstrap_script = local.bootstrap_script
-
+  
 }
 
-# data "azurerm_linux_virtual_machine" "vm" {
-#   name                = data.azurerm_linux_virtual_machine.name
-#   resource_group_name = data.azurerm_resource_group.resource_group.name
-# } 
+resource "null_resource" "print_name" {
+   depends_on = [
+    module.openvpn-server
+  ]
+
+  provisioner "local-exec" {
+      command = "chmod 400 ${local.private-key-file} ; ${local.openvpn-test-script} ${module.openvpn-server.vm_private_ip} ${module.openvpn-server.vm_public_ip} ${local.private-key-file} ${var.admin_username} "
+  }
+}
 
 

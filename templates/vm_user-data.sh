@@ -1,5 +1,5 @@
 #!/bin/sh
-​
+
 . /etc/os-release
 echo $ID
 echo $VERSION_ID
@@ -26,5 +26,5 @@ then
   cd /usr/local/openvpn_as/scripts/ 
   sudo ./sacli --user openvpn --key "prop_autologin" --value "true" UserPropPut 
   sudo ./sacli --prefer-tls-crypt-v2 --user openvpn GetAutologin > /root/client.ovpn
-​
-fi
+ 
+ fi

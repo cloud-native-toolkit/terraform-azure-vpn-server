@@ -23,7 +23,7 @@ variable "subnet_id" {
 variable "name_prefix" {
   type        = string
   description = "Name to prefix resources created"
-  default     = "opn-vpn"
+  default     = "open-vpn"
 }
 
 variable "machine_type" {
@@ -65,7 +65,7 @@ variable "private_ip_address_allocation_type" {
 variable "admin_username" {
   type        = string
   description = "Username for the admin user (default = \"adminuser\")"
-  default     = "adminuser"
+  default     = "azureuser"
 }
 
 variable "bootstrap_script" {
@@ -77,7 +77,7 @@ variable "bootstrap_script" {
 variable "vm_size" {
   type        = string
   description = "This is the size of Virtual Machine (defualt = \"Standard_F2\")"
-  default     = "Standard_D2_v3"
+  default     = "Standard_B1s"
 }
 
 variable "storage_type" {
@@ -97,30 +97,3 @@ variable "vm_public_ip_allocation_method" {
   description = "The Azure subnet Public ip address alocation type - Dynamic or Static (default = \"Dynamic\")"
   default     = "Static"
 }
-
-
-# variable "openvpn_image_publisher" {
-#   type        = string
-#   description = "Open VPN OS image publisher name (default = \"openvpn\")"
-#   default     = "openvpn"
-# }
-
-# variable "openvpn_image_offer" {
-#   type        = string
-#   description = "Open VPN OS image source offer (default = \"openvpnas\")"
-#   default     = "openvpnas"
-# }
-
-# variable "openvpn_image_sku" {
-#   type        = string
-#   description = "Open VPN OS image SKU (defualt = \"access_server_byol\")"
-#   default     = "access_server_byol"
-# }
-
-# variable "openvpn_image_version" {
-#   type        = string
-#   description = "Linux OS image version (default = \"latest\")"
-#   default     = "latest"
-# }
-
-
