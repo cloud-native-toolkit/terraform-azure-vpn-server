@@ -16,3 +16,7 @@ output "admin_username" {
   ]
   value = var.admin_username
 }
+
+output "vm_private_ip" {
+  value = module.openvpn-server.vm_private_ip
+}
