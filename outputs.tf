@@ -20,3 +20,10 @@ output "admin_username" {
 output "vm_private_ip" {
   value = module.openvpn-server.vm_private_ip
 }
+
+output "client_config_file" {
+  depends_on = [
+    null_resource.download_config
+  ]
+  value = "${path.cwd}/${local.client_config_file}"
+}
