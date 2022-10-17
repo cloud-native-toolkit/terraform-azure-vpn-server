@@ -1,5 +1,4 @@
 locals {
-   private-key-file = "${var.name_prefix}-key"
    client_config_file = "${var.name_prefix}-client.ovpn"
 }
 
@@ -10,10 +9,11 @@ module "openvpn-server" {
   name_prefix                        = var.name_prefix
   resource_group_name                = var.resource_group_name
   subnet_id                          = var.subnet_id
-  create_ssh                         = true
-  use_ssh                            = var.use_ssh
-  pub_ssh_key                        = var.pub_ssh_key
-  machine_type                       = var.machine_type
+  create_ssh                         = false
+  use_ssh                            = true
+  public                             = true
+  pub_ssh_key                        = file(var.pub_ssh_key_file)
+  machine_type                       = "Linux"
   private_ip_address_allocation_type = var.private_ip_address_allocation_type
 
   vm_size          = var.vm_size
@@ -40,7 +40,7 @@ resource "null_resource" "download_config" {
   triggers = {
     private_ip  = module.openvpn-server.vm_private_ip
     public_ip   = module.openvpn-server.vm_public_ip
-    ssh_key     = local.private-key-file
+    ssh_key     = var.private_key_file
     username    = module.openvpn-server.admin_username
     config_file = local.client_config_file
     work_dir    = path.cwd

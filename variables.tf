@@ -26,34 +26,16 @@ variable "name_prefix" {
   default     = "open-vpn"
 }
 
-variable "machine_type" {
+variable "pub_ssh_key_file" {
   type        = string
-  description = "The type of VM to create - (default = \"Linux\")"
-  default     = "Linux"
-}
-
-variable "use_ssh" {
-  type        = bool
-  description = "Use SSH key for access to Linux VM (default = \"true\")"
-  default     = true
-}
-
-variable "pub_ssh_key" {
-  type        = string
-  description = "Public SSH key for VM access. Provide an empty variable for windows VMs as it is not used."
+  description = "Path to the public SSH key for VM access."
   default     = ""
 }
 
-variable "create_ssh" {
-  type        = bool
-  description = "Flag to determine whether to create an SSH key pair (default = \"true\")"
-  default     = true
-}
-
-variable "public" {
-  type        = bool
-  description = "Flag to indicate if VM shoudl have a public IP allocated (default = \"true\")"
-  default     = true
+variable "private_key_file" {
+  type        = string
+  description = "Path to the SSH private key for remote access."
+  default     = ""
 }
 
 variable "private_ip_address_allocation_type" {
