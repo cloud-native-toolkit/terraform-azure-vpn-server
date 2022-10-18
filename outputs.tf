@@ -23,7 +23,7 @@ output "vm_private_ip" {
 
 output "client_config_file" {
   depends_on = [
-    null_resource.download_config
+    null_resource.download_client_config
   ]
   value = "${path.cwd}/${local.client_config_file}"
 }

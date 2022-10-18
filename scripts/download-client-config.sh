@@ -1,24 +1,14 @@
 #!/usr/bin/env bash
 
+# Ensure right permissions on private key
 chmod 400 ${KEY_FILE}
-ssh -o "StrictHostKeyChecking no" -i ${KEY_FILE} ${VM_USERNAME}@${VM_PUBLIC_IP} "pwd ; sudo cp /root/client.ovpn .; sudo ls"
-scp -i ${KEY_FILE} ${VM_USERNAME}@${VM_PUBLIC_IP}:/home/${VM_USERNAME}/client.ovpn ${WORK_DIR}/${CLIENT_CONFIG_FILE}
 
-## Update Client configuration
-if [ -e "${WORK_DIR}/${CLIENT_CONFIG_FILE}" ]; then
+# Generate client configuration on remote VPN server
+ssh -o "StrictHostKeyChecking no" -i ${KEY_FILE} ${VM_USERNAME}@${VM_PUBLIC_IP} << EOF
+  sudo /usr/local/openvpn_as/scripts/sacli --user openvpn --key "prop_autologin" --value "true" UserPropPut 
+  sudo /usr/local/openvpn_as/scripts/sacli --prefer-tls-crypt-v2 --user openvpn GetAutologin > /home/${VM_USERNAME}/${CLIENT_CONFIG_FILE}
+  sudo chown ${VM_USERNAME} /home/${VM_USERNAME}/${CLIENT_CONFIG_FILE}
+EOF
 
-    ## Change VPN server private IP address to public IP address
-    OS_TYPE=$(uname -a | awk '{print $1}')
-    if [[ "${OS_TYPE}" == "Darwin" ]]; then
-        sed -i '' "s/remote ${VM_PRIVATE_IP}/remote ${VM_PUBLIC_IP}/g" ${WORK_DIR}/${CLIENT_CONFIG_FILE}
-    elif [[ "${OS_TYPE}" == "Linux" ]]; then
-        sed -i "s/remote ${VM_PRIVATE_IP}/remote ${VM_PUBLIC_IP}/g" ${WORK_DIR}/${CLIENT_CONFIG_FILE}
-    else
-        echo "ERROR: Unknown operating system ${OS_TYPE}"
-        exit 2
-    fi
-    echo "Client configuration ${CLIENT_CONFIG_FILE} updated."
-else
-    echo "ERROR: Client configuration ${CLIENT_CONFIG_FILE} not found in ${WORK_DIR}."
-    exit 2
-fi
+# Copy generated client configuration to local working directory
+scp -i ${KEY_FILE} ${VM_USERNAME}@${VM_PUBLIC_IP}:/home/${VM_USERNAME}/${CLIENT_CONFIG_FILE} ${WORK_DIR}/${CLIENT_CONFIG_FILE}

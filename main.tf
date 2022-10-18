@@ -1,6 +1,6 @@
 locals {
    client_config_file = "${var.name_prefix}-client.ovpn"
-   server-config-filename = "${var.name_prefix}-vpn-config.json"
+   server_config_file = "${var.name_prefix}-vpn-config.json"
 }
 
 // Open-VPN VM Configurations
@@ -40,14 +40,42 @@ resource "local_file" "server_config" {
     NETWORK_CIDRS         = var.private_network_cidrs
     PRIVATE_DNS_SVRS      = var.private_dns
   })
-  filename = "${path.cwd}/${local.server-config-filename}"
+  filename = "${path.cwd}/${local.server_config_file}"
   file_permission = "0600"
 }
 
-resource "null_resource" "download_config" {
+resource "null_resource" "update_config" {
+  depends_on = [
+    local_file.server_config,
+    time_sleep.wait_for_bootrap
+  ]
+
+  triggers = {
+    ssh_key     = var.private_key_file
+    username    = module.openvpn-server.admin_username
+    config_file = local.server_config_file
+    public_ip   = module.openvpn-server.vm_public_ip
+    work_dir    = path.cwd
+  }
+
+  provisioner "local-exec" {
+    command = "${path.module}/scripts/update-svr-config.sh"
+
+    environment = {
+      CONFIG_FILE   = self.triggers.config_file
+      WORK_DIR      = self.triggers.work_dir
+      VM_PUBLIC_IP  = self.triggers.public_ip
+      VM_USERNAME   = self.triggers.username
+      KEY_FILE      = self.triggers.ssh_key
+     }
+  }
+ 
+}
+
+resource "null_resource" "download_client_config" {
    depends_on = [
     module.openvpn-server,
-    time_sleep.wait_for_bootrap
+    null_resource.update_config
   ]
 
   triggers = {

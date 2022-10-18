@@ -22,9 +22,5 @@ then
     sudo echo "deb http://as-repository.openvpn.net/as/debian focal main">/etc/apt/sources.list.d/openvpn-as-repo.list
   fi
   sudo apt update && sudo apt -y install openvpn-as 
-​
-  cd /usr/local/openvpn_as/scripts/ 
-  sudo ./sacli --user openvpn --key "prop_autologin" --value "true" UserPropPut 
-  sudo ./sacli --prefer-tls-crypt-v2 --user openvpn GetAutologin > /root/client.ovpn
  
  fi
