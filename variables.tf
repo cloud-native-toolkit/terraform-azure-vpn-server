@@ -24,10 +24,33 @@ variable "private_key_file" {
   description = "Path to the SSH private key for remote access."
 }
 
+variable "private_network_cidrs" {
+  type = list(string)
+  description = "List of CIDRs in the private network reachable via the VPN server."
+}
+
+variable "private_dns" {
+  type = list(string)
+  description = "List of private DNS servers"
+  default = ["168.63.129.16"]
+}
+
 variable "name_prefix" {
   type        = string
   description = "Name to prefix resources created"
   default     = "open-vpn"
+}
+
+variable "client_network" {
+  type = string
+  description = "Network address for VPN clients (default = \"172.27.224.0\")"
+  default = "172.27.224.0"
+}
+
+variable "client_network_bits" {
+  type = string
+  description = "Number of netmask bits for the VPN client network (default = \"24\")"
+  default = "24"
 }
 
 variable "private_ip_address_allocation_type" {

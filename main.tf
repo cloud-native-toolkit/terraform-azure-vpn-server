@@ -32,6 +32,18 @@ resource "time_sleep" "wait_for_bootrap" {
   create_duration = "120s"
 }
 
+resource "local_file" "server_config" {
+  content = templatefile("${path.module}/templates/server-config.json.tftpl",{
+    PUBLIC_IP             = module.openvpn-server.vm_public_ip
+    CLIENT_NETWORK_BITS   = var.client_network_bits
+    CLIENT_NETWORK        = var.client_network
+    NETWORK_CIDRS         = var.private_network_cidrs
+    PRIVATE_DNS_SVRS      = var.private_dns
+  })
+  filename = "${path.cwd}/${local.server-config-filename}"
+  file_permission = "0600"
+}
+
 resource "null_resource" "download_config" {
    depends_on = [
     module.openvpn-server,
