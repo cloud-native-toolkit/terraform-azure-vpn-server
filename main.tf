@@ -32,39 +32,6 @@ resource "time_sleep" "wait_for_bootrap" {
   create_duration = "120s"
 }
 
-resource "null_resource" "download_svr_config" {
-  depends_on = [
-    module.openvpn-server,
-    time_sleep.wait_for_bootrap    
-  ]
-
-  triggers = {
-    public_ip         = module.openvpn-server.vm_public_ip
-    ssh_key           = var.private_key_file
-    username          = module.openvpn-server.admin_username 
-    work_dir          = path.cwd  
-    config_filename   = local.server-config-filename     
-  }
-
-  provisioner "local-exec" {
-    command = "${path.module}/scripts/download-svr-config.sh"
-
-    environment = {
-        VM_PUBLIC_IP        = self.triggers.public_ip
-        KEY_FILE            = self.triggers.ssh_key
-        VM_USERNAME         = self.triggers.username
-        WORK_DIR            = self.triggers.work_dir
-        CONFIG_FILE_NAME    = self.triggers.config_filename
-     }
-  }
-
-  provisioner "local-exec" {
-    when = destroy
-
-    command = "rm ${self.triggers.work_dir}/${self.triggers.config_filename}"
-  }
-}
-
 resource "null_resource" "download_config" {
    depends_on = [
     module.openvpn-server,
