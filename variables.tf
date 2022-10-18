@@ -14,28 +14,20 @@ variable "subnet_id" {
   description = "The Azure subnet id to which to attach the virtual machine private NIC"
 }
 
-# variable "azurerm_network_interface_accelerated_networking" {
-#   type        = bool
-#   description = "Use SSH key for access to Linux VM (default = \"true\")"
-#   default     = true
-# }
-
-variable "name_prefix" {
-  type        = string
-  description = "Name to prefix resources created"
-  default     = "open-vpn"
-}
-
 variable "pub_ssh_key_file" {
   type        = string
   description = "Path to the public SSH key for VM access."
-  default     = ""
 }
 
 variable "private_key_file" {
   type        = string
   description = "Path to the SSH private key for remote access."
-  default     = ""
+}
+
+variable "name_prefix" {
+  type        = string
+  description = "Name to prefix resources created"
+  default     = "open-vpn"
 }
 
 variable "private_ip_address_allocation_type" {

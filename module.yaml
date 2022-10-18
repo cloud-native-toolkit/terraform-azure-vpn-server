@@ -25,7 +25,6 @@ versions:
           - source: github.com/cloud-native-toolkit/terraform-azure-subnets
             version: ">= 1.2.2"
       - id: ssh_key
-        optional: true
         refs:
           - source: github.com/cloud-native-toolkit/teraform-azure-ssh-key
             version: ">= 1.0.6"
@@ -43,12 +42,10 @@ versions:
           id: subnet
           output: id
       - name: pub_ssh_key_file
-        optional: true
         moduleRef: 
           id: ssh_key
           output: pub_key_file
       - name: private_key_file
-        optional: true
         moduleRef: 
           id: ssh_key
           output: private_key_file
