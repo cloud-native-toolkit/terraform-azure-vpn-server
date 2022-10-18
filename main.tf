@@ -47,7 +47,7 @@ resource "null_resource" "download_config" {
   }
 
   provisioner "local-exec" {
-      command = "${path.module}/scripts/download-config.sh"
+      command = "${path.module}/scripts/download-client-config.sh"
 
       environment = {
         VM_PRIVATE_IP       = self.triggers.private_ip
