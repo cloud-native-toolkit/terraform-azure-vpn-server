@@ -10,10 +10,10 @@ module "openvpn-server" {
   name_prefix                        = var.name_prefix
   resource_group_name                = var.resource_group_name
   subnet_id                          = var.subnet_id
-  create_ssh                         = false
+  create_ssh                         = var.pub_ssh_key_file == "" ? true : false
   use_ssh                            = true
   public                             = true
-  pub_ssh_key                        = file(var.pub_ssh_key_file)
+  pub_ssh_key                        = var.pub_ssh_key_file == "" ? "" : file(var.pub_ssh_key_file)
   machine_type                       = "Linux"
   private_ip_address_allocation_type = var.private_ip_address_allocation_type
 
