@@ -49,4 +49,15 @@ versions:
         moduleRef: 
           id: ssh_key
           output: private_key_file
+    outputs:
+      - name: id
+        description: "The Azure id of the created VPN server"
+      - name: vm_public_ip
+        description: "The public IP address of the created VPN server"
+      - name: admin_username
+        description: "The administrator username of the created VPN server"
+      - name: vm_private_ip
+        description: "The private IP address of the created VPN server"
+      - name: client_config_file
+        description: "The full path and filename of the created VPN client connection file"
 cloudProvider: azure
