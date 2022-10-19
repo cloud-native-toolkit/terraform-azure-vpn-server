@@ -3,17 +3,30 @@ locals {
    server_config_file = "${var.name_prefix}-vpn-config.json"
 }
 
+resource "null_resource" "print_key_name" {
+  provisioner "local-exec" {
+    command = "echo 'Using public key: ${var.pub_ssh_key_file}'"
+  }
+}
+
+data "local_file" "pub_key" {
+  depends_on = [
+    null_resource.print_key_name
+  ]
+  filename = var.pub_ssh_key_file
+}
+
 // Open-VPN VM Configurations
 module "openvpn-server" {
 
-  source                             = "github.com/cloud-native-toolkit/terraform-azure-vm?ref=v2.0.2"
+  source                             = "github.com/cloud-native-toolkit/terraform-azure-vm?ref=v2.0.3"
   name_prefix                        = var.name_prefix
   resource_group_name                = var.resource_group_name
   subnet_id                          = var.subnet_id
   create_ssh                         = false
   use_ssh                            = true
   public                             = true
-  pub_ssh_key                        = file(var.pub_ssh_key_file)
+  pub_ssh_key                        = data.local_file.pub_key.content
   machine_type                       = "Linux"
   private_ip_address_allocation_type = var.private_ip_address_allocation_type
 
