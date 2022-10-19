@@ -2,8 +2,127 @@ name: azure-vpn-server
 type: terraform
 description: Module to provision vpn-server on azure
 tags:
-  - tools
-  - devops
-versions: []
+  - azure
+  - azure-vm
+  - virtual-machine
+  - azure-vpn-server
+versions:
+  - platforms: []
+    providers:
+      - name: azurerm
+        source: hashicorp/azurerm
+    dependencies:
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-resource-group
+            version: '>= 1.0.0'
+      - id: vnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-vnet
+            version: '>= 1.0.2'
+      - id: subnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-subnets
+            version: '>= 1.2.2'
+      - id: ssh_key
+        refs:
+          - source: github.com/cloud-native-toolkit/teraform-azure-ssh-key
+            version: '>= 1.0.6'
+    variables:
+      - name: resource_group_name
+        type: string
+        description: >-
+          The name of the Azure resource group where the VM is to be
+          provisioned. The VM will be provisioned in the same location as the
+          resource group.
+        moduleRef:
+          id: resource_group
+          output: name
+      - name: virtual_network_name
+        type: string
+        description: The name of the Azure VNet.
+        moduleRef:
+          id: vnet
+          output: name
+      - name: subnet_id
+        type: string
+        description: The Azure subnet id to which to attach the virtual machine private NIC
+        moduleRef:
+          id: subnet
+          output: id
+      - name: pub_ssh_key_file
+        type: string
+        description: Path to the public SSH key for VM access.
+        moduleRef:
+          id: ssh_key
+          output: pub_key_file
+      - name: private_key_file
+        type: string
+        description: Path to the SSH private key for remote access.
+        moduleRef:
+          id: ssh_key
+          output: private_key_file
+      - name: private_network_cidrs
+        type: list(string)
+        description: List of CIDRs in the private network reachable via the VPN server.
+      - name: private_dns
+        type: list(string)
+        description: List of private DNS servers
+        default:
+          - 168.63.129.16
+      - name: name_prefix
+        type: string
+        description: Name to prefix resources created
+        default: open-vpn
+      - name: client_network
+        type: string
+        description: Network address for VPN clients (default = \"172.27.224.0\")
+        default: 172.27.224.0
+      - name: client_network_bits
+        type: string
+        description: Number of netmask bits for the VPN client network (default = \"24\")
+        default: '24'
+      - name: private_ip_address_allocation_type
+        type: string
+        description: >-
+          The Azure subnet private ip address alocation type - Dynamic or Static
+          (default = \"Dynamic\")
+        default: Dynamic
+      - name: admin_username
+        type: string
+        description: Username for the admin user (default = \"adminuser\")
+        default: azureuser
+      - name: bootstrap_script
+        type: string
+        description: >-
+          Path to file with the bootstrap script (default =
+          \"./template/user-data.sh\")
+        default: ''
+      - name: vm_size
+        type: string
+        description: This is the size of Virtual Machine (defualt = \"Standard_F2\")
+        default: Standard_B1s
+      - name: storage_type
+        type: string
+        description: Storage account type (default = \"StandardSSD_LRS\")
+        default: StandardSSD_LRS
+      - name: vm_public_ip_sku
+        type: string
+        description: Public IP SKU Size (default = \"Standard\")
+        default: Standard
+      - name: vm_public_ip_allocation_method
+        type: string
+        description: >-
+          The Azure subnet Public ip address alocation type - Dynamic or Static
+          (default = \"Dynamic\")
+        default: Static
+    version: v1.0.0
+    outputs:
+      - name: id
+      - name: vm_public_ip
+      - name: vm_public_fqdn
+      - name: admin_username
+      - name: vm_private_ip
+      - name: client_config_file
 cloudProvider: azure
 id: github.com/cloud-native-toolkit/terraform-azure-vpn-server
