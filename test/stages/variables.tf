@@ -21,8 +21,6 @@ variable "vnet_cidr" {
   default     = "10.0.0.0/18"
 }
 
-variable "enabled" {}
-
 variable "subscription_id" {}
 
 variable "client_id" {}
