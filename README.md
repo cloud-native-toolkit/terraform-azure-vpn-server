@@ -3,8 +3,10 @@
 ## Module overview
 
 Module creates an Azure VPN Server. It includes the following resources:
-- tls_private_key
-- openvpn-server
+- read local public key file
+- Azure VM creation via module with custom bootstrap script for VPN server
+- creation and application of VPN server configuration
+- creation and download of VPN client connection file
 
 ### Software dependencies
 
@@ -25,38 +27,131 @@ This modules makes use of the output from other modules:
 ## Example Usage
 
 ```hcl-terraform
-module "resource_group" {
-  source = "github.com/cloud-native-toolkit/terraform-azure-resource-group"
+locals {
+  name_prefix     = "myexample"
+  region          = "eastus"
+  vnet_cidr       = "10.0.0.0/18"
+  subnet_cidrs    = cidrsubnets(local.vnet_cidr, 2, 2)
+  ingress_cidr    = local.subnet_cidrs[0]
+  internal_cidr   = local.subnet_cidrs[1]
+}
 
-  resource_group_name = "mytest-rg"
-  region              = var.region
+module "resource_group" {
+  source = "github.com/cloud-native-toolkit/terraform-azure-resource-group?ref=v1.1.1"
+
+  resource_group_name = "${local.name_prefix}-rg"
+  region              = local.region
 }
 
 module "vnet" {
-  source = "github.com/cloud-native-toolkit/terraform-azure-vnet"
+  source = "github.com/cloud-native-toolkit/terraform-azure-vnet?ref=v1.1.3"
 
-  name_prefix         = "mytest"
+  name_prefix         = local.name_prefix
   resource_group_name = module.resource_group.name
   region              = module.resource_group.region
-  address_prefixes    = ["10.0.0.0/18"]
+  address_prefixes    = [local.vnet_cidr]
 }
 
-module "subnets" {
-  source = "github.com/cloud-native-toolkit/terraform-azure-subnets"
+module "ingress-subnet" {
+  source = "github.com/cloud-native-toolkit/terraform-azure-subnets?ref=v1.3.7"
 
+  label               = "ingress"
   resource_group_name = module.resource_group.name
   region              = module.resource_group.region
   vnet_name           = module.vnet.name
-  ipv4_cidr_blocks    = ["10.0.0.0/24"]
+  ipv4_cidr_blocks    = [local.ingress_cidr]
   acl_rules           = []
 }
 
-module "vm" {
-  source               = "github.com/cloud-native-toolkit/terraform-azure-vm"
-  
-  name_prefix         = "mytest-vm"
+module "internal-subnet" {
+  source = "github.com/cloud-native-toolkit/terraform-azure-subnets?ref=v1.3.7"
+
+  label               = "internal"
   resource_group_name = module.resource_group.name
-  subnet_id           = module.subnets.id
+  region              = module.resource_group.region
+  vnet_name           = module.vnet.name
+  ipv4_cidr_blocks    = [local.internal_cidr]
+  acl_rules           = []
+}
+
+module "nsg" {
+    source = "github.com/cloud-native-toolkit/terraform-azure-nsg?ref=v1.0.5"
+
+
+    name_prefix           = local.name_prefix
+    resource_group_name   = module.resource_group.name
+    region                = module.resource_group.region
+    virtual_network_name  = module.vnet.name
+    subnet_ids            = [module.ingress-subnet.id]
+    acl_rules = [{
+          name                = "ssh-inbound"   // Required for VPN configuration
+          priority            = "102"
+          access              = "Allow"
+          protocol            = "Tcp"
+          direction           = "Inbound"
+          source_addr         = "*"
+          destination_addr    = "*"
+          source_ports        = "*"
+          destination_ports   = "22"
+        },{
+          name                = "vpn-inbound-tcp"
+          priority            = "103"
+          access              = "Allow"
+          protocol            = "Tcp"
+          direction           = "Inbound"
+          source_addr         = "*"
+          destination_addr    = "*"
+          source_ports        = "*"
+          destination_ports   = "443"
+        },{
+          name                = "vpn-inbound-udp"
+          priority            = "104"
+          access              = "Allow"
+          protocol            = "Udp"
+          direction           = "Inbound"
+          source_addr         = "*"
+          destination_addr    = "*"
+          source_ports        = "*"
+          destination_ports   = "1194"
+        }
+    ]
+}
+
+module "route-table" {
+  source = "github.com/cloud-native-toolkit/terraform-azure-rtb?ref=v1.0.0"
+
+  name_prefix           = local.name_prefix
+  resource_group_name   = module.resource_group.name
+  region                = module.resource_group.region
+  subnet_ids            = [module.ingress-subnet.id, module.internal-subnet.id]
+
+  routes = [{
+    name                    = "internal-route"
+    address_prefix          = local.vnet_cidr
+    next_hop_type           = "VnetLocal"
+    next_hop_in_ip_address  = ""
+  }]
+}
+
+module "ssh-keys" {
+  source = "github.com/cloud-native-toolkit/terraform-azure-ssh-key?ref=v1.0.6"
+
+  key_name            = "${local.name_prefix}-key"
+  resource_group_name = module.resource_group.name
+  region              = module.resource_group.region
+  store_path          = "${path.cwd}/.ssh"
+}
+
+module "vpn-server" {
+  source = "github.com/cloud-native-toolkit/terraform-azure-vpn-server"
+  
+  name_prefix             = "${local.name_prefix}-vpn"
+  resource_group_name     = module.resource_group.name
+  virtual_network_name    = module.vnet.name
+  subnet_id               = module.ingress-subnet.id
+  pub_ssh_key_file        = module.ssh-keys.pub_key_file
+  private_key_file        = module.ssh-keys.private_key_file
+  private_network_cidrs   = [local.vnet_cidr]
 }
 ```
 ## Variables
